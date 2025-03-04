@@ -22,9 +22,8 @@ Before running the script, ensure you have the following installed:
 2.  **Place the PDF:** Put the protected PDF file (e.g., `remote.pdf`) in the same directory as the Python script.
 3.  **Run the Script:** Execute the Python script.
     ```bash
-    python your_script_name.py
+    python pdf_cracker.py
     ```
-    (Replace `your_script_name.py` with the actual name of your Python file.)
 4.  **Observe the Output:** The script will attempt each password from the wordlist and display the results in the terminal.
     * If a password is incorrect, it will be printed in red.
     * If a password is correct, it will be printed in green, and the script will terminate.
