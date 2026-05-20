@@ -1,19 +1,20 @@
-# Import necessary libraries
-import pikepdf  # For handling PDF files
-from termcolor import colored  # For printing colored output in the terminal
+"""Backward-compatible launcher for legacy PDF cracking workflow.
 
-# Open the wordlist file containing potential passwords
-file = open("wordlist.txt")
+Use `python -m smartcrack.cli crack <file.pdf> --wordlist <wordlist>` for the full framework.
+"""
 
-# Iterate through each password in the wordlist
-for password in file:
-    try:
-        # Attempt to open the encrypted PDF file with the current password
-        with pikepdf.open("remote.pdf", password.strip()) as p:
-            # If successful, print the found password in green and exit the loop
-            print(colored("Password Found: {}".format(password), "green"))
-            break
-    except:
-        # If the password is incorrect, print a red message and continue to the next password
-        print(colored("Trying Password: {}".format(password), "red"), end="")
-        continue
+from __future__ import annotations
+
+from pathlib import Path
+
+from smartcrack.pdf_legacy import crack_pdf_with_wordlist
+
+
+if __name__ == "__main__":
+    pdf = Path("remote.pdf")
+    wordlist = Path("wordlist.txt")
+    password = crack_pdf_with_wordlist(pdf, wordlist)
+    if password:
+        print(f"Password Found: {password}")
+    else:
+        print("Password not found in wordlist")
