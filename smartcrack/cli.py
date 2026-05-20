@@ -12,9 +12,8 @@ from smartcrack.crackers.planner import build_plan
 from smartcrack.detectors.input_detector import detect_input
 from smartcrack.extractors.john_extractors import extract_hash
 from smartcrack.identifiers.hash_identifier import identify_hash
-from smartcrack.pdf_legacy import crack_pdf_with_wordlist
 from smartcrack.sessions.store import write_session
-from smartcrack.utils.subprocess_safe import run_command, which
+from smartcrack.utils.subprocess_safe import run_command
 
 app = typer.Typer(help="SmartCrack: intelligent wrapper for hash extraction and cracking workflows")
 console = Console()
@@ -63,8 +62,8 @@ def crack(target: str, wordlist: str = "", backend: str = typer.Option(None), ma
     cfg = load_config()
     wl = wordlist or cfg.get("default_wordlist")
 
-    if not wl and detection.kind != "raw_hash":
-        raise typer.BadParameter("No wordlist configured. Use `smartcrack config --wordlist <path>`.")
+    if not wl:
+        raise typer.BadParameter("No wordlist configured. Use `smartcrack config --wordlist <path>` or --wordlist.")
 
     extracted_hashes = []
     hash_value = target
@@ -76,12 +75,6 @@ def crack(target: str, wordlist: str = "", backend: str = typer.Option(None), ma
 
     candidates = identify_hash(hash_value)
     top = candidates[0] if candidates else None
-
-    if detection.kind == "pdf" and detection.input_path and which("pdf2john") is None and wl:
-        cracked = crack_pdf_with_wordlist(detection.input_path, Path(wl))
-        if cracked:
-            console.print(f"[green]Password found via legacy PDF path:[/green] {cracked}")
-            return
 
     tmp_hash_file = None
     hash_input = hash_value
@@ -114,6 +107,9 @@ def crack(target: str, wordlist: str = "", backend: str = typer.Option(None), ma
             "return_code": result.code,
         }
     )
+
+    if tmp_hash_file:
+        Path(tmp_hash_file).unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

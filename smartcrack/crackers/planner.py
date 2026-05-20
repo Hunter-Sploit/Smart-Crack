@@ -6,7 +6,9 @@ from smartcrack.utils.subprocess_safe import which
 
 def choose_backend(candidate: HashCandidate | None, preferred: str | None = None) -> str:
     if preferred:
-        return preferred
+        preferred = preferred.lower()
+        if preferred in {"hashcat", "john"}:
+            return preferred
     hashcat = which("hashcat")
     john = which("john")
     if candidate and candidate.hashcat_mode is not None and hashcat:

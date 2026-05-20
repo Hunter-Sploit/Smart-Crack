@@ -4,10 +4,6 @@ SmartCrack evolves the original PDF-only cracker into a modular intelligent crac
 
 > Authorized-use only: run this tool only on systems/files you own or are explicitly permitted to audit.
 
-## What was reused from the old codebase
-
-The original `pikepdf` dictionary attack flow has been preserved and refactored into `smartcrack/pdf_legacy.py` as a compatibility fallback path. If `pdf2john` is unavailable, SmartCrack can still perform direct PDF wordlist cracking using the improved legacy logic.
-
 ## Architecture
 
 ```text
@@ -21,7 +17,6 @@ smartcrack/
   config/store.py
   sessions/store.py
   utils/subprocess_safe.py
-  pdf_legacy.py             # Refactored legacy PDF workflow
   plugins/                  # Extension point
 ```
 
@@ -34,7 +29,7 @@ smartcrack/
 - Configured wordlist management (`~/.smartcrack/config.json`)
 - Session logging (`~/.smartcrack/sessions/*.json`) for resume/forensics/history
 - Safe subprocess handling (no shell interpolation, argument lists only)
-- Backward-compatible `pdf_cracker.py` entrypoint
+- Single CLI entrypoint (`python -m smartcrack`)
 
 ## Installation
 
@@ -52,26 +47,26 @@ Install cracking dependencies separately:
 
 ### Configure default wordlist
 ```bash
-python -m smartcrack.cli config --wordlist /path/to/rockyou.txt
+python -m smartcrack config --wordlist /path/to/rockyou.txt
 ```
 
 ### Identify hash
 ```bash
-python -m smartcrack.cli identify '$2b$12$abcdefghijklmnopqrstuu5f6rXHfQZfI5XjVd2kB6vhcxRkq'
-python -m smartcrack.cli identify hashes.txt
+python -m smartcrack identify '$2b$12$abcdefghijklmnopqrstuu5f6rXHfQZfI5XjVd2kB6vhcxRkq'
+python -m smartcrack identify hashes.txt
 ```
 
 ### Crack (auto workflow)
 ```bash
-python -m smartcrack.cli crack secret.pdf
-python -m smartcrack.cli crack archive.zip --wordlist /path/to/wordlist.txt
-python -m smartcrack.cli crack dump.hash --backend john
-python -m smartcrack.cli crack '$1c8bfe8f801d79745c4631d09fff36c82' --wordlist /path/to/wl.txt
+python -m smartcrack crack secret.pdf
+python -m smartcrack crack archive.zip --wordlist /path/to/wordlist.txt
+python -m smartcrack crack dump.hash --backend john
+python -m smartcrack crack '$1c8bfe8f801d79745c4631d09fff36c82' --wordlist /path/to/wl.txt
 ```
 
 ### Hashcat mask override
 ```bash
-python -m smartcrack.cli crack dump.hash --mask '?a?a?a?a?a?a'
+python -m smartcrack crack dump.hash --mask '?a?a?a?a?a?a'
 ```
 
 ## Current limitations and next improvements
@@ -80,12 +75,6 @@ python -m smartcrack.cli crack dump.hash --mask '?a?a?a?a?a?a'
 - Recommendation engine is basic and should be expanded with probabilistic strategy scoring.
 - Distributed cracking/API/dashboard features are intentionally not included in this first generalized baseline.
 
-## Legacy compatibility
+## Notes
 
-The old workflow still works:
-
-```bash
-python pdf_cracker.py
-```
-
-This expects `remote.pdf` and `wordlist.txt` in the current directory, same as before.
+- PDF extraction now requires `pdf2john` to be installed and available in `PATH`.
