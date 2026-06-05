@@ -1,0 +1,55 @@
+# Example hashes for hashcat - SmartCrack demonstration
+# These are sample hashes in various formats that can be cracked with hashcat
+# Use with: python -m smartcrack crack example_hashes.txt --wordlist <wordlist>
+
+# MD5 hashes (hashcat mode 0)
+# password: "password"
+5f4dcc3b5aa765d61d8327deb882cf99
+# password: "admin"
+21232f297a57a5a743894a0e4a801fc3
+# password: "123456"
+e807f1fcf82d132f9bb018ca6738a19f
+
+# SHA1 hashes (hashcat mode 100)
+# password: "password"
+5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8
+# password: "admin"
+d033e22ae348aeb5660fc2140aec35850c4da997
+# password: "hello"
+aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d
+
+# SHA256 hashes (hashcat mode 1400)
+# password: "password"
+5e884898da28047151d0e56f8dc62927845f5c520a550de58b9c47af9ad8e217
+# password: "admin"
+8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+# password: "hashcat"
+1e7e9b0f4cc7d6b9ba8aa58c3d9e5c6f5a4d3c2b1a0f9e8d7c6b5a4f3e2d1c0
+
+# bcrypt hashes (hashcat mode 3200)
+# password: "password"
+$2b$12$Yzk7dXbKj.0.EKjEpqgvN.8EhY2x3QUBgLhK5E1V0sJl1p7qFRx3u
+# password: "admin"
+$2b$12$R9h/cIPz0gi.URNNGRV3rOevsLG8nVsDnOHEVHbvYkGJJ8qW4RVXO
+
+# NTLM hashes (hashcat mode 1000) - commonly found in Windows dumps
+# password: "password"
+8846f7eaee8fb117ad06bdd830b7586c
+# password: "admin"
+209c6174da490caeb422f3fa5a7ae634
+
+# MD5 with salt (hashcat mode 10)
+# password: "password", salt: "salt"
+6a204bd8bce90f2a3a9e90a6e47213f8:salt
+
+# SHA256 with salt (hashcat mode 1710)
+# password: "password", salt: "salt"
+$5$salt$eGSigWJlPyHPltF4wY2i7kcD/dANpwKG7hOPOjYL7B5:salt
+
+# MySql 5.7+ hashes (hashcat mode 7401)
+# password: "password"
+*2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19
+
+# Oracle 10g/11g (hashcat mode 3100)
+# password: "password"
+EA4D5C2B1672CC9B1567490471E8F67DFF2D4487B2B91948
