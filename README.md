@@ -280,14 +280,6 @@ python -m smartcrack config --reset
 - No distributed cracking (intentional for v1)
 - Limited rule/mask documentation
 
-### Planned Improvements
-- [ ] Expanded extractor coverage (nested archives, hybrid formats)
-- [ ] Probabilistic hash type scoring
-- [ ] REST API for integration
-- [ ] Web dashboard for campaign management
-- [ ] Distributed cracking support
-- [ ] GPU farm orchestration
-
 ---
 
 ## 🤝 Contributing
