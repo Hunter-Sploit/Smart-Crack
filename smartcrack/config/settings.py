@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from pydantic import Field
@@ -21,35 +22,60 @@ class Settings(BaseSettings):
     session_dir: str = Field(default_factory=lambda: str(Path.home() / ".smartcrack" / "sessions"))
 
 
+CONFIG_DIR = Path.home() / ".smartcrack"
+CONFIG_PATH = CONFIG_DIR / "config.json"
+
 _settings: Settings | None = None
 
 
 def get_settings() -> Settings:
     global _settings
     if _settings is None:
-        _settings = Settings()
+        _settings = _load_or_migrate()
     return _settings
+
+
+def _load_or_migrate() -> Settings:
+    if CONFIG_PATH.exists():
+        try:
+            old = json.loads(CONFIG_PATH.read_text())
+            return Settings(
+                default_wordlist=old.get("default_wordlist"),
+                wordlists=old.get("wordlists", []),
+                preferred_tool=old.get("preferred_backend"),
+                timeout_seconds=old.get("timeout_seconds", 3600),
+                session_dir=old.get("session_dir", str(CONFIG_DIR / "sessions")),
+            )
+        except (json.JSONDecodeError, OSError):
+            pass
+    return Settings()
 
 
 def save_settings(settings: Settings) -> None:
     global _settings
     _settings = settings
-    _persist_to_json(settings)
-
-
-def _persist_to_json(settings: Settings) -> None:
-    config_dir = Path.home() / ".smartcrack"
-    config_path = config_dir / "config.json"
-    config_dir.mkdir(parents=True, exist_ok=True)
-    data = settings.model_dump()
-    config_path.write_text(json.dumps(data, indent=2))
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    CONFIG_PATH.write_text(json.dumps(settings.model_dump(), indent=2))
 
 
 def reset_settings() -> Settings:
     global _settings
     _settings = Settings()
-    _persist_to_json(_settings)
+    save_settings(_settings)
     return _settings
 
 
-import json
+def load_config() -> dict:
+    return get_settings().model_dump()
+
+
+def set_default_wordlist(path: str) -> None:
+    settings = get_settings()
+    settings.default_wordlist = path
+    if path not in settings.wordlists:
+        settings.wordlists.append(path)
+    save_settings(settings)
+
+
+def reset_config() -> dict:
+    return reset_settings().model_dump()

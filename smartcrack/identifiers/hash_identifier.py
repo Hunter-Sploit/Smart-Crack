@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from smartcrack.models import HashCandidate
 
@@ -11,33 +11,34 @@ from smartcrack.models import HashCandidate
 def load_patterns() -> list[dict[str, Any]]:
     patterns_path = Path(__file__).parent / "patterns.json"
     with patterns_path.open("r") as f:
-        return json.load(f)
+        return cast(list[dict[str, Any]], json.load(f))
 
 
 PATTERNS = load_patterns()
 
 
 def _calculate_confidence(pattern: dict[str, Any], text: str) -> float:
-    base = pattern.get("priority", 50) / 100.0
-    metadata = pattern.get("metadata", {})
+    base: float = float(pattern.get("priority", 50)) / 100.0
+    metadata = pattern.get("metadata", {}) or {}
+    mtype: str | None = metadata.get("type")
+    context: str = metadata.get("context", "generic") or "generic"
 
-    if metadata.get("type") == "crypt":
-        return min(base + 0.1, 0.99)
-    if metadata.get("type") in {"archive", "kerberos", "ldap", "database", "app", "network", "legacy"}:
-        return min(base + 0.05, 0.95)
-    if metadata.get("type") == "salted":
-        return min(base + 0.05, 0.95)
-    if metadata.get("type") == "raw":
-        ctx = metadata.get("context", "generic")
-        if ctx == "windows" and "NTLM" in pattern["name"]:
-            return min(base + 0.05, 0.95)
+    if mtype == "crypt":
+        return float(min(base + 0.1, 0.99))
+    if mtype in {"archive", "kerberos", "ldap", "database", "app", "network", "legacy"}:
+        return float(min(base + 0.05, 0.95))
+    if mtype == "salted":
+        return float(min(base + 0.05, 0.95))
+    if mtype == "raw":
+        if context == "windows" and "NTLM" in pattern["name"]:
+            return float(min(base + 0.05, 0.95))
         return base
 
     return base
 
 
 def _build_commands(candidate: HashCandidate, wordlist: str = "wordlist.txt") -> dict[str, str]:
-    commands = {}
+    commands: dict[str, str] = {}
     if candidate.hashcat_mode is not None:
         commands["hashcat"] = f"hashcat -m {candidate.hashcat_mode} -a 0 hash.txt {wordlist}"
     if candidate.john_format is not None:
@@ -90,8 +91,8 @@ def identify_hash(text: str, wordlist: str = "wordlist.txt") -> list[HashCandida
             notes="hex digest heuristic"
         ))
 
-    seen = set()
-    unique = []
+    seen: set[tuple[str, int | None, str | None]] = set()
+    unique: list[HashCandidate] = []
     for c in sorted(candidates, key=lambda x: x.confidence, reverse=True):
         key = (c.name, c.hashcat_mode, c.john_format)
         if key not in seen:
@@ -103,7 +104,7 @@ def identify_hash(text: str, wordlist: str = "wordlist.txt") -> list[HashCandida
 
 
 def get_identification_table_data(candidates: list[HashCandidate]) -> list[dict[str, str]]:
-    rows = []
+    rows: list[dict[str, str]] = []
     for c in candidates:
         hc = str(c.hashcat_mode) if c.hashcat_mode is not None else "-"
         jf = c.john_format or "-"

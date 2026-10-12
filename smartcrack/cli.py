@@ -8,8 +8,8 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from smartcrack.config.store import load_config, reset_config, set_default_wordlist
-from smartcrack.detectors.input_detector import detect_input
+from smartcrack.config.settings import load_config, reset_config, set_default_wordlist
+from smartcrack.detectors.input_detector import DetectionResult, detect_input
 from smartcrack.extractors.john_extractors import extract_hash
 from smartcrack.identifiers.hash_identifier import get_identification_table_data, identify_hash
 from smartcrack.sessions.store import write_session
@@ -24,7 +24,7 @@ def identify(
     target: str,
     wordlist: str = typer.Option("wordlist.txt", "--wordlist", "-w", help="Wordlist for command examples"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
-):
+) -> None:
     """Identify hash type(s) and show ready-to-use hashcat/john commands."""
     if Path(target).exists():
         data = Path(target).read_text(errors="ignore")
@@ -75,7 +75,7 @@ def config(
     wordlist: str = typer.Option(None, help="Set default wordlist path"),
     show: bool = typer.Option(False, "--show", help="Display current configuration"),
     reset: bool = typer.Option(False, "--reset", help="Reset configuration to defaults"),
-):
+) -> None:
     """Manage configuration."""
     cfg = load_config()
     if reset:
@@ -90,7 +90,7 @@ def config(
         console.print(cfg)
 
 
-def _prepare_hash_input(target: str, detection) -> tuple[str, str, str | None]:
+def _prepare_hash_input(target: str, detection: DetectionResult) -> tuple[str, str, str | None]:
     """Prepare hash input for cracking backend. Returns (hash_input_path, hash_value, temp_file_to_cleanup)."""
     extracted_hashes = []
     hash_value = target
@@ -142,7 +142,7 @@ def crack(
     wordlist: str = typer.Option(None, "--wordlist", "-w", help="Path to wordlist"),
     mask: str = typer.Option(None, "--mask", help="Hashcat mask for brute-force (implies -a 3)"),
     rules: str = typer.Option(None, "--rules", help="Path to rules file (John)"),
-):
+) -> None:
     """Crack hash using specified tool. Auto-detects mode/format unless overridden."""
     toolname = toolname.lower()
     if toolname not in {"hashcat", "john"}:

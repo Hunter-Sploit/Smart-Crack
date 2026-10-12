@@ -1,6 +1,5 @@
 import pytest
-from smartcrack.config.legacy import load_config, set_default_wordlist, reset_config
-from smartcrack.config.settings import get_settings, Settings
+from smartcrack.config import load_config, set_default_wordlist, reset_config, get_settings, Settings
 
 
 class TestConfig:
@@ -30,6 +29,7 @@ class TestConfig:
         # Create old-style JSON config
         import json
         from pathlib import Path
+        from smartcrack.config.settings import _settings
         config_dir = Path.home() / ".smartcrack"
         config_dir.mkdir(parents=True, exist_ok=True)
         config_path = config_dir / "config.json"
@@ -41,8 +41,11 @@ class TestConfig:
             "session_dir": "/old/sessions"
         }
         config_path.write_text(json.dumps(old_config))
-        
+
         try:
+            # Force re-load to test migration
+            import smartcrack.config.settings as settings_module
+            settings_module._settings = None
             cfg = load_config()
             assert cfg["default_wordlist"] == "/old/path/wordlist.txt"
             assert cfg["wordlists"] == ["/old/wordlist1.txt", "/old/wordlist2.txt"]
@@ -50,6 +53,8 @@ class TestConfig:
             assert cfg["timeout_seconds"] == 7200
         finally:
             config_path.unlink(missing_ok=True)
+            # Reset global
+            settings_module._settings = None
 
     def test_reset_config(self):
         set_default_wordlist("wordlist_sample.txt")
