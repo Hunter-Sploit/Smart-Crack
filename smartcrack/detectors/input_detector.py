@@ -4,7 +4,6 @@ from pathlib import Path
 
 from smartcrack.models import DetectionResult
 
-
 MAGIC_SIGNATURES: dict[bytes, str] = {
     b"%PDF": "pdf",
     b"PK\x03\x04": "zip",
@@ -60,7 +59,7 @@ def detect_input(target: str) -> DetectionResult:
                 content = p.read_bytes()[:5000]
                 if b"[Content_Types].xml" in content and (b"word/" in content or b"xl/" in content or b"ppt/" in content):
                     return DetectionResult(input_path=p, kind="office", confidence=0.90, reasons=["ZIP structure matches Office Open XML"])
-            except Exception:
+            except (OSError, UnicodeDecodeError):
                 pass
 
         # Check for hash dump files
@@ -69,9 +68,8 @@ def detect_input(target: str) -> DetectionResult:
             return DetectionResult(input_path=p, kind="hash_dump", confidence=0.70, reasons=["text file resembles hash dump"])
 
         # Check for SSH private key in text form
-        if content_sample.lstrip().startswith("-----BEGIN"):
-            if "PRIVATE KEY" in content_sample:
-                return DetectionResult(input_path=p, kind="ssh", confidence=0.95, reasons=["PEM private key detected"])
+        if content_sample.lstrip().startswith("-----BEGIN") and "PRIVATE KEY" in content_sample:
+            return DetectionResult(input_path=p, kind="ssh", confidence=0.95, reasons=["PEM private key detected"])
 
         return DetectionResult(input_path=p, kind="file", confidence=0.40, reasons=["generic file"])
 

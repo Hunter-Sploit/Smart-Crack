@@ -1,0 +1,410 @@
+[
+  {
+    "pattern": "^\\$6\\$",
+    "name": "sha512crypt",
+    "hashcat_mode": 1800,
+    "john_format": "sha512crypt",
+    "priority": 100,
+    "metadata": {"type": "crypt", "context": "linux"}
+  },
+  {
+    "pattern": "^\\$5\\$",
+    "name": "sha256crypt",
+    "hashcat_mode": 7400,
+    "john_format": "sha256crypt",
+    "priority": 100,
+    "metadata": {"type": "crypt", "context": "linux"}
+  },
+  {
+    "pattern": "^\\$1\\$",
+    "name": "md5crypt",
+    "hashcat_mode": 500,
+    "john_format": "md5crypt",
+    "priority": 100,
+    "metadata": {"type": "crypt", "context": "linux"}
+  },
+  {
+    "pattern": "^\\$apr1\\$[A-Za-z0-9./]{8}\\$[A-Za-z0-9./]{22}$",
+    "name": "Apache MD5 (apr1)",
+    "hashcat_mode": 1600,
+    "john_format": "apache-md5",
+    "priority": 100,
+    "metadata": {"type": "crypt", "context": "apache"}
+  },
+  {
+    "pattern": "^\\$P\\$[A-Za-z0-9./]{31}$",
+    "name": "phpass",
+    "hashcat_mode": 400,
+    "john_format": "phpass",
+    "priority": 100,
+    "metadata": {"type": "crypt", "context": "php"}
+  },
+  {
+    "pattern": "^\\$H\\$[A-Za-z0-9./]{31}$",
+    "name": "phpass (portable)",
+    "hashcat_mode": 400,
+    "john_format": "phpass",
+    "priority": 100,
+    "metadata": {"type": "crypt", "context": "php"}
+  },
+  {
+    "pattern": "^\\$2[aby]\\$\\d{2}\\$.{53}$",
+    "name": "bcrypt",
+    "hashcat_mode": 3200,
+    "john_format": "bcrypt",
+    "priority": 100,
+    "metadata": {"type": "crypt", "context": "web"}
+  },
+  {
+    "pattern": "^\\$WPA\\$",
+    "name": "WPA-PBKDF2",
+    "hashcat_mode": 2500,
+    "john_format": "wpapsk",
+    "priority": 100,
+    "metadata": {"type": "crypt", "context": "wifi"}
+  },
+  {
+    "pattern": "^\\$SHA\\$[0-9]+\\$[A-Za-z0-9./]{8}\\$[A-Za-z0-9./]{43}$",
+    "name": "SHA (Sun)",
+    "hashcat_mode": 3300,
+    "john_format": "sun-md5",
+    "priority": 100,
+    "metadata": {"type": "crypt", "context": "solaris"}
+  },
+  {
+    "pattern": "^_[a-zA-Z0-9./]{20}$",
+    "name": "BSDi Crypt",
+    "hashcat_mode": 12400,
+    "john_format": "bsdi",
+    "priority": 100,
+    "metadata": {"type": "crypt", "context": "bsd"}
+  },
+  {
+    "pattern": "^[a-zA-Z0-9./]{13}$",
+    "name": "DES crypt",
+    "hashcat_mode": 1500,
+    "john_format": "descrypt",
+    "priority": 100,
+    "metadata": {"type": "crypt", "context": "unix"}
+  },
+  {
+    "pattern": "^\\$pdf\\$",
+    "name": "PDF",
+    "hashcat_mode": 10400,
+    "john_format": "pdf",
+    "priority": 90,
+    "metadata": {"type": "archive", "context": "pdf"}
+  },
+  {
+    "pattern": "^\\$zip2\\$",
+    "name": "ZIP",
+    "hashcat_mode": 13600,
+    "john_format": "zip",
+    "priority": 90,
+    "metadata": {"type": "archive", "context": "zip"}
+  },
+  {
+    "pattern": "^\\$rar\\$",
+    "name": "RAR",
+    "hashcat_mode": 13000,
+    "john_format": "rar",
+    "priority": 90,
+    "metadata": {"type": "archive", "context": "rar"}
+  },
+  {
+    "pattern": "^\\$7z\\$",
+    "name": "7-Zip",
+    "hashcat_mode": 11600,
+    "john_format": "7z",
+    "priority": 90,
+    "metadata": {"type": "archive", "context": "7zip"}
+  },
+  {
+    "pattern": "^\\$office\\$",
+    "name": "MS Office",
+    "hashcat_mode": 9400,
+    "john_format": "office",
+    "priority": 90,
+    "metadata": {"type": "archive", "context": "office"}
+  },
+  {
+    "pattern": "^\\$oldoffice\\$",
+    "name": "MS Office (old)",
+    "hashcat_mode": 9700,
+    "john_format": "oldoffice",
+    "priority": 90,
+    "metadata": {"type": "archive", "context": "office"}
+  },
+  {
+    "pattern": "^\\$krb5",
+    "name": "Kerberos",
+    "hashcat_mode": 13100,
+    "john_format": "krb5",
+    "priority": 100,
+    "metadata": {"type": "kerberos", "context": "windows"}
+  },
+  {
+    "pattern": "^\\{SHA\\}[A-Za-z0-9+/]+={0,2}$",
+    "name": "LDAP SHA1",
+    "hashcat_mode": 101,
+    "john_format": "nsldap",
+    "priority": 90,
+    "metadata": {"type": "ldap", "context": "ldap"}
+  },
+  {
+    "pattern": "^\\{SSHA\\}[A-Za-z0-9+/]+={0,2}$",
+    "name": "LDAP SSHA1",
+    "hashcat_mode": 111,
+    "john_format": "nsldaps",
+    "priority": 90,
+    "metadata": {"type": "ldap", "context": "ldap"}
+  },
+  {
+    "pattern": "^\\{SSHA256\\}[A-Za-z0-9+/]+={0,2}$",
+    "name": "LDAP SSHA256",
+    "hashcat_mode": 1411,
+    "john_format": "ldap-sha256",
+    "priority": 90,
+    "metadata": {"type": "ldap", "context": "ldap"}
+  },
+  {
+    "pattern": "^\\{SSHA512\\}[A-Za-z0-9+/]+={0,2}$",
+    "name": "LDAP SSHA512",
+    "hashcat_mode": 1711,
+    "john_format": "ldap-sha512",
+    "priority": 90,
+    "metadata": {"type": "ldap", "context": "ldap"}
+  },
+  {
+    "pattern": "^\\*[A-F0-9]{40}$",
+    "name": "MySQL 5.7+",
+    "hashcat_mode": 7401,
+    "john_format": "mysql-sha1",
+    "priority": 90,
+    "metadata": {"type": "database", "context": "mysql"}
+  },
+  {
+    "pattern": "^0x0100[a-fA-F0-9]{82}$",
+    "name": "MSSQL 2000",
+    "hashcat_mode": 131,
+    "john_format": "mssql",
+    "priority": 90,
+    "metadata": {"type": "database", "context": "mssql"}
+  },
+  {
+    "pattern": "^0x0200[a-fA-F0-9]{82}$",
+    "name": "MSSQL 2012+",
+    "hashcat_mode": 1731,
+    "john_format": "mssql12",
+    "priority": 90,
+    "metadata": {"type": "database", "context": "mssql"}
+  },
+  {
+    "pattern": "^[A-F0-9]{60,}$",
+    "name": "Oracle 10g/11g",
+    "hashcat_mode": 3100,
+    "john_format": "oracle11",
+    "priority": 90,
+    "metadata": {"type": "database", "context": "oracle"}
+  },
+  {
+    "pattern": "^sha1\\$[a-fA-F0-9]{12}\\$[a-fA-F0-9]{40}$",
+    "name": "Django SHA1",
+    "hashcat_mode": 124,
+    "john_format": "django",
+    "priority": 90,
+    "metadata": {"type": "app", "context": "django"}
+  },
+  {
+    "pattern": "^[A-Fa-f0-9]{16}$",
+    "name": "LM",
+    "hashcat_mode": 3000,
+    "john_format": "lm",
+    "priority": 90,
+    "metadata": {"type": "legacy", "context": "windows"}
+  },
+  {
+    "pattern": "^[A-Za-z0-9+/]+={0,2}:[A-Fa-f0-9]{8}$",
+    "name": "Juniper NetScreen",
+    "hashcat_mode": 22,
+    "john_format": "juniper",
+    "priority": 90,
+    "metadata": {"type": "network", "context": "juniper"}
+  },
+  {
+    "pattern": "^3u\\+[A-Za-z0-9+/]+={0,2}$",
+    "name": "Juniper IVE",
+    "hashcat_mode": 501,
+    "john_format": "juniper-ive",
+    "priority": 90,
+    "metadata": {"type": "network", "context": "juniper"}
+  },
+  {
+    "pattern": "^[A-Fa-f0-9]{16}:[A-Fa-f0-9]{16}$",
+    "name": "Cisco PIX/ASA",
+    "hashcat_mode": 2400,
+    "john_format": "cisco-pix",
+    "priority": 90,
+    "metadata": {"type": "network", "context": "cisco"}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{32}$",
+    "name": "MD5",
+    "hashcat_mode": 0,
+    "john_format": "raw-md5",
+    "priority": 80,
+    "metadata": {"type": "raw", "context": "generic", "charset": "hex", "length": 32}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{40}$",
+    "name": "SHA1",
+    "hashcat_mode": 100,
+    "john_format": "raw-sha1",
+    "priority": 80,
+    "metadata": {"type": "raw", "context": "generic", "charset": "hex", "length": 40}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{64}$",
+    "name": "SHA256",
+    "hashcat_mode": 1400,
+    "john_format": "raw-sha256",
+    "priority": 80,
+    "metadata": {"type": "raw", "context": "generic", "charset": "hex", "length": 64}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{128}$",
+    "name": "SHA512",
+    "hashcat_mode": 1700,
+    "john_format": "raw-sha512",
+    "priority": 80,
+    "metadata": {"type": "raw", "context": "generic", "charset": "hex", "length": 128}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{32}$",
+    "name": "NTLM",
+    "hashcat_mode": 1000,
+    "john_format": "nt",
+    "priority": 70,
+    "metadata": {"type": "raw", "context": "windows", "charset": "hex", "length": 32}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{40}$",
+    "name": "RIPEMD-160",
+    "hashcat_mode": 6000,
+    "john_format": "ripemd160",
+    "priority": 70,
+    "metadata": {"type": "raw", "context": "generic", "charset": "hex", "length": 40}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{96}$",
+    "name": "Whirlpool",
+    "hashcat_mode": 6100,
+    "john_format": "whirlpool",
+    "priority": 70,
+    "metadata": {"type": "raw", "context": "generic", "charset": "hex", "length": 96}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{64}$",
+    "name": "GOST R 34.11-94",
+    "hashcat_mode": 6900,
+    "john_format": "gost",
+    "priority": 70,
+    "metadata": {"type": "raw", "context": "generic", "charset": "hex", "length": 64}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{56}$",
+    "name": "SHA3-224",
+    "hashcat_mode": 17300,
+    "john_format": "sha3-224",
+    "priority": 70,
+    "metadata": {"type": "raw", "context": "generic", "charset": "hex", "length": 56}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{64}$",
+    "name": "SHA3-256",
+    "hashcat_mode": 17400,
+    "john_format": "sha3-256",
+    "priority": 70,
+    "metadata": {"type": "raw", "context": "generic", "charset": "hex", "length": 64}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{96}$",
+    "name": "SHA3-384",
+    "hashcat_mode": 17500,
+    "john_format": "sha3-384",
+    "priority": 70,
+    "metadata": {"type": "raw", "context": "generic", "charset": "hex", "length": 96}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{128}$",
+    "name": "SHA3-512",
+    "hashcat_mode": 17600,
+    "john_format": "sha3-512",
+    "priority": 70,
+    "metadata": {"type": "raw", "context": "generic", "charset": "hex", "length": 128}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{32}:[A-Fa-f0-9]{32}$",
+    "name": "NTLMv2",
+    "hashcat_mode": 5600,
+    "john_format": "netntlmv2",
+    "priority": 95,
+    "metadata": {"type": "salted", "context": "windows"}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{32}:[^:]{1,}$",
+    "name": "MD5 (salted)",
+    "hashcat_mode": 10,
+    "john_format": "md5-salted",
+    "priority": 85,
+    "metadata": {"type": "salted", "context": "generic"}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{40}:[^:]{1,}$",
+    "name": "SHA1 (salted)",
+    "hashcat_mode": 110,
+    "john_format": "sha1-salted",
+    "priority": 85,
+    "metadata": {"type": "salted", "context": "generic"}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{64}:[^:]{1,}$",
+    "name": "SHA256 (salted)",
+    "hashcat_mode": 1410,
+    "john_format": "sha256-salted",
+    "priority": 85,
+    "metadata": {"type": "salted", "context": "generic"}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{128}:[^:]{1,}$",
+    "name": "SHA512 (salted)",
+    "hashcat_mode": 1710,
+    "john_format": "sha512-salted",
+    "priority": 85,
+    "metadata": {"type": "salted", "context": "generic"}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{32}:[^:]{3,}$",
+    "name": "vBulletin",
+    "hashcat_mode": 2611,
+    "john_format": "vbulletin",
+    "priority": 85,
+    "metadata": {"type": "salted", "context": "vbulletin"}
+  },
+  {
+    "pattern": "^[a-fA-F0-9]{32}:[^:]{5}$",
+    "name": "IPB/MyBB",
+    "hashcat_mode": 2811,
+    "john_format": "ipb",
+    "priority": 85,
+    "metadata": {"type": "salted", "context": "ipb"}
+  },
+  {
+    "pattern": "^[A-F0-9]{48,60}$",
+    "name": "Oracle 10g/11g",
+    "hashcat_mode": 3100,
+    "john_format": "oracle11",
+    "priority": 90,
+    "metadata": {"type": "database", "context": "oracle"}
+  }
+]

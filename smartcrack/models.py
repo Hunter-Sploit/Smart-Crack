@@ -28,6 +28,7 @@ class HashCandidate:
     hashcat_mode: int | None = None
     john_format: str | None = None
     notes: str = ""
+    commands: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass
