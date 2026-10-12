@@ -9,7 +9,7 @@
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Clone and setup
@@ -32,7 +32,7 @@ python -m smartcrack crack --toolname john --wordlist wordlist_sample.txt hash.t
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 - **🔍 Hash Identification**: Identifies 70+ hash types with confidence scoring
   - Displays hashcat mode and john format for each candidate
