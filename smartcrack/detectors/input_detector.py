@@ -40,6 +40,13 @@ RAW_HASH_PREFIX_HINTS = {
     "$apr1$": "apache-md5",
     "$P$": "phpass",
     "$H$": "phpass",
+    "$argon2id$": "argon2",
+    "$argon2i$": "argon2",
+    "$argon2d$": "argon2",
+    "$8$": "cisco8",
+    "$9$": "cisco9",
+    "$ssh$": "ssh",
+    "pbkdf2_sha256$": "django-pbkdf2",
 }
 
 
@@ -54,7 +61,6 @@ def detect_input(target: str) -> DetectionResult:
 
         # Check for newer Office formats (.docx, .xlsx, .pptx) - these are ZIP-based
         if data.startswith(b"PK\x03\x04"):
-            # Could be a modern Office file, check content
             try:
                 content = p.read_bytes()[:5000]
                 if b"[Content_Types].xml" in content and (b"word/" in content or b"xl/" in content or b"ppt/" in content):
@@ -62,33 +68,54 @@ def detect_input(target: str) -> DetectionResult:
             except (OSError, UnicodeDecodeError):
                 pass
 
-        # Check for hash dump files
-        content_sample = p.read_text(errors="ignore")[:5000]
-        if ":" in content_sample and "$" in content_sample:
-            return DetectionResult(input_path=p, kind="hash_dump", confidence=0.70, reasons=["text file resembles hash dump"])
-
         # Check for SSH private key in text form
-        if content_sample.lstrip().startswith("-----BEGIN") and "PRIVATE KEY" in content_sample:
-            return DetectionResult(input_path=p, kind="ssh", confidence=0.95, reasons=["PEM private key detected"])
+        try:
+            content_sample = p.read_text(errors="ignore")[:5000]
+            if content_sample.lstrip().startswith("-----BEGIN") and "PRIVATE KEY" in content_sample:
+                return DetectionResult(input_path=p, kind="ssh", confidence=0.95, reasons=["PEM private key detected"])
+
+            # Check for text files containing hashes or credential dumps
+            lines = [
+                ln.strip()
+                for ln in content_sample.splitlines()
+                if ln.strip() and not ln.strip().startswith(("#", "//", ";"))
+            ]
+            if lines:
+                is_dump = any(":" in ln for ln in lines)
+                kind = "hash_dump" if is_dump else "hash_list"
+                return DetectionResult(
+                    input_path=p,
+                    kind=kind,
+                    confidence=0.85,
+                    reasons=[f"text file containing {'credential dump' if is_dump else 'hash list'}"],
+                )
+        except (OSError, UnicodeDecodeError):
+            pass
 
         return DetectionResult(input_path=p, kind="file", confidence=0.40, reasons=["generic file"])
 
+    clean_target = target.strip().strip('"').strip("'")
+
     # Raw string input - check hash prefixes
     for prefix, kind in RAW_HASH_PREFIX_HINTS.items():
-        if target.startswith(prefix):
+        if clean_target.startswith(prefix):
             return DetectionResult(input_path=None, kind="raw_hash", confidence=0.90, reasons=[f"prefix matched {kind}"])
 
     # Check for PEM private key in raw string
-    if target.lstrip().startswith("-----BEGIN") and "PRIVATE KEY" in target:
+    if clean_target.lstrip().startswith("-----BEGIN") and "PRIVATE KEY" in clean_target:
         return DetectionResult(input_path=None, kind="raw_hash", confidence=0.90, reasons=["PEM private key detected"])
 
+    # Credential dump string (e.g. root:$6$... or user:hash)
+    if ":" in clean_target and any(prefix in clean_target for prefix in ("$", ":")):
+        return DetectionResult(input_path=None, kind="raw_hash", confidence=0.85, reasons=["credential dump line"])
+
     # Hex digest heuristic
-    if len(target) in {32, 40, 64, 128} and all(c in "0123456789abcdefABCDEF" for c in target):
+    if len(clean_target) in {32, 40, 64, 128} and all(c in "0123456789abcdefABCDEF" for c in clean_target):
         return DetectionResult(input_path=None, kind="raw_hash", confidence=0.80, reasons=["hex digest heuristic"])
 
     # JWT token heuristic
-    if target.count(".") == 2 and len(target.split(".")) == 3:
-        parts = target.split(".")
+    if clean_target.count(".") == 2 and len(clean_target.split(".")) == 3:
+        parts = clean_target.split(".")
         if all(c.isalnum() or c in "-_" for p in parts for c in p):
             return DetectionResult(input_path=None, kind="raw_hash", confidence=0.65, reasons=["JWT token shape"])
 

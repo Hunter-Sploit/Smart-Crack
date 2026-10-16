@@ -1,0 +1,13 @@
+services:
+  smartcrack:
+    build: .
+    image: smartcrack:latest
+    volumes:
+      - ./sessions:/root/.smartcrack/sessions
+      - ./:/workspace:ro
+    working_dir: /app
+
+  test:
+    build: .
+    image: smartcrack:latest
+    entrypoint: ["pytest", "tests/", "-v"]

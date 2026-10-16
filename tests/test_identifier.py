@@ -88,6 +88,49 @@ class TestHashIdentifier:
         candidates = identify_hash("$2b$12$Yzk7dXbKj.0.EKjEpqgvN.8EhY2x3QUBgLhK5E1V0sJl1p7qFRx3u")
         assert candidates[0].confidence >= candidates[1].confidence if len(candidates) > 1 else True
 
+    def test_username_hash_format(self):
+        candidates = identify_hash("admin:5f4dcc3b5aa765d61d8327deb882cf99")
+        names = [c.name for c in candidates]
+        assert "MD5" in names
+        assert "NTLM" in names
+        assert any("user: admin" in c.notes for c in candidates)
+
+    def test_shadow_file_format(self):
+        line = "root:$6$rounds=5000$usesomesillystri$D4IrlXatmP7rx3v3mqhkRfQu3VcQMgcEiDAFiIgX73QuIxFTO79SRK+nm.FDKEt0WBj6D61MszIDZuvApdqs71:15323:0:99999:7:::"
+        candidates = identify_hash(line)
+        names = [c.name for c in candidates]
+        assert "sha512crypt" in names
+        assert any("shadow" in c.notes for c in candidates)
+
+    def test_pwdump_format(self):
+        line = "Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::"
+        candidates = identify_hash(line)
+        names = [c.name for c in candidates]
+        assert "NTLM" in names or "MD5" in names
+        assert any("pwdump" in c.notes for c in candidates)
+
+    def test_argon2(self):
+        line = "$argon2id$v=19$m=65536,t=3,p=4$c29tZXNhbHQ$somehash"
+        candidates = identify_hash(line)
+        names = [c.name for c in candidates]
+        assert "Argon2" in names
+        argon2 = next(c for c in candidates if c.name == "Argon2")
+        assert argon2.hashcat_mode == 7300
+        assert argon2.john_format == "argon2"
+
+    def test_quotes_and_comments_stripping(self):
+        line = '"5f4dcc3b5aa765d61d8327deb882cf99"  # this is md5'
+        candidates = identify_hash(line)
+        names = [c.name for c in candidates]
+        assert "MD5" in names
+
+    def test_sha384(self):
+        # 96 hex characters
+        sha384_hash = "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b"
+        candidates = identify_hash(sha384_hash)
+        names = [c.name for c in candidates]
+        assert "SHA-384" in names
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

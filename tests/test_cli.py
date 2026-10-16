@@ -162,5 +162,43 @@ class TestIdentifier:
         assert candidates[0].confidence >= candidates[1].confidence if len(candidates) > 1 else True
 
 
+class TestCliCommands:
+    def test_cli_identify_success(self):
+        from typer.testing import CliRunner
+        from smartcrack.cli import app
+        runner = CliRunner()
+        result = runner.invoke(app, ["identify", "5f4dcc3b5aa765d61d8327deb882cf99"])
+        assert result.exit_code == 0
+        assert "MD5" in result.stdout
+
+    def test_cli_identify_json(self):
+        import json
+        from typer.testing import CliRunner
+        from smartcrack.cli import app
+        runner = CliRunner()
+        result = runner.invoke(app, ["identify", "5f4dcc3b5aa765d61d8327deb882cf99", "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.stdout)
+        assert len(data) > 0
+        assert data[0]["candidates"][0]["candidate"] == "MD5"
+
+    def test_cli_identify_prompt_empty(self):
+        from typer.testing import CliRunner
+        from smartcrack.cli import app
+        runner = CliRunner()
+        result = runner.invoke(app, ["identify"], input="\n")
+        assert result.exit_code == 0
+        assert "No input provided" in result.stdout
+
+    def test_cli_identify_user_hash_line(self):
+        from typer.testing import CliRunner
+        from smartcrack.cli import app
+        runner = CliRunner()
+        result = runner.invoke(app, ["identify", "admin:5f4dcc3b5aa765d61d8327deb882cf99"])
+        assert result.exit_code == 0
+        assert "MD5" in result.stdout
+        assert "admin" in result.stdout
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

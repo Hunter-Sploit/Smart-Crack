@@ -6,37 +6,45 @@ SmartCrack identifies password hash types and gives you ready-to-use `hashcat` a
 
 ## Quick Start
 
+> 📘 For a full step-by-step walkthrough, see the [Getting Started Guide](GETTING_STARTED.md).
+
 ```bash
-# Clone and install
+# 1. Clone repository
 git clone https://github.com/Hunter-Sploit/Smart-Crack.git
 cd Smart-Crack
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
 
-# Configure default wordlist (one-time)
-python -m smartcrack config --wordlist /path/to/rockyou.txt
+# 2. Automated Install (Linux / macOS)
+./install.sh
+source .venv/bin/activate
 
-# 1. Identify hash type - shows all candidates with commands
-python -m smartcrack identify '$2b$12$Yzk7dXbKj.0.EKjEpqgvN.8EhY2x3QUBgLhK5E1V0sJl1p7qFRx3u'
+# Windows: run install.bat or .\install.ps1
 
-# 2. Crack using auto-detected mode from identification
-python -m smartcrack crack --toolname hashcat --wordlist rockyou.txt hash.txt
-python -m smartcrack crack --toolname john --wordlist rockyou.txt hash.txt
+# 3. Identify a hash (single hash, file, or credential dump)
+smartcrack identify '$2b$12$Yzk7dXbKj.0.EKjEpqgvN.8EhY2x3QUBgLhK5E1V0sJl1p7qFRx3u'
+
+# 4. Crack automatically (auto-selects tool and wordlist)
+smartcrack crack example_hashes.txt
+```
+
+*Or run directly without activating the virtual environment:*
+```bash
+./run.sh identify example_hashes.txt
+./run.sh crack example_hashes.txt
 ```
 
 ## Features
 
-- **Hash identification** - 70+ hash types with confidence scoring, hashcat mode, and john format
-- **Ready-to-run commands** - Copy/paste the exact `hashcat` or `john` command for each candidate
-- **Manual workflow** - Identify first, then crack with explicit tool choice (`--toolname hashcat|john`)
-- **Auto-detection** - Crack command infers mode/format from identification, with overrides available
-- **Persistent config** - Default wordlist saved to `~/.smartcrack/config.json`
-- **Session logging** - Full audit trail in `~/.smartcrack/sessions/`
-- **Safe subprocess handling** - No shell injection, argument-list execution
-- **Clean CLI** - Built with Typer and Rich
+- **Hash identification (80+ types)** - MD5, SHA1, SHA256, bcrypt, Argon2, NTLM, sha512crypt, Kerberos, Cisco, and more
+- **Structured format extraction** - Automatically parses Linux `/etc/shadow`, Windows pwdump/SAM dumps, and `user:hash` formats
+- **Ready-to-run commands** - Copy/paste exact `hashcat` and `john` commands generated for every candidate
+- **Zero-friction cracking** - Auto-detects tool (`hashcat` or `john`) and wordlist (`wordlist_sample.txt` or `rockyou.txt`) if omitted
+- **Interactive fallback** - Prompts politely if input is omitted rather than erroring out
+- **1-Click Installers** - Quick setup scripts (`install.sh`, `install.bat`, `install.ps1`) for Linux, macOS, and Windows
+- **Direct CLI entrypoint** - Run `smartcrack` anywhere inside the environment
+- **Safe execution** - Non-shell subprocess execution preventing injection vulnerabilities
+- **Persistent configuration** - Default wordlist and settings saved to `~/.smartcrack/config.json`
 
-## Supported Hash Types (70+)
+## Supported Hash Types (80+)
 
 | Type | Hashcat Mode | John Format |
 |------|--------------|-------------|
@@ -44,80 +52,83 @@ python -m smartcrack crack --toolname john --wordlist rockyou.txt hash.txt
 | SHA1 | 100 | raw-sha1 |
 | SHA256 | 1400 | raw-sha256 |
 | SHA512 | 1700 | raw-sha512 |
+| SHA-384 / SHA-224 | 10800 / 1400 | raw-sha384 / raw-sha224 |
 | bcrypt | 3200 | bcrypt |
-| NTLM | 1000 | nt |
-| NTLMv2 | 5600 | netntlmv2 |
+| Argon2 (id/i/d) | 7300 | argon2 |
+| NTLM / NTLMv2 | 1000 / 5600 | nt / netntlmv2 |
 | sha512crypt | 1800 | sha512crypt |
 | sha256crypt | 7400 | sha256crypt |
 | md5crypt | 500 | md5crypt |
 | MySQL 5.7+ | 7401 | mysql-sha1 |
-| Kerberos | 13100 | krb5 |
+| Kerberos (AS-REP / TGS) | 18200 / 13100 | krb5asrep / krb5 |
+| Cisco Type 8 / 9 | 9200 / 9300 | cisco8 / cisco9 |
 | WPA-PBKDF2 | 2500 | wpapsk |
-| ...and 50+ more | | |
+| ...and 60+ more | | |
 
 Patterns are defined in `smartcrack/identifiers/patterns.json` - easy to extend.
 
 ## Installation
 
-### Prerequisites
-- Python 3.9+
-- `hashcat` (for GPU cracking)
-- `john` + extractors (`pdf2john`, `zip2john`, etc.)
+### 1-Click Automated Setup
+- **Linux / macOS**:
+  ```bash
+  ./install.sh
+  source .venv/bin/activate
+  ```
+- **Windows**:
+  ```cmd
+  install.bat
+  .venv\Scripts\activate
+  ```
 
-### Setup
-
+### Manual Setup
 ```bash
 git clone https://github.com/Hunter-Sploit/Smart-Crack.git
 cd Smart-Crack
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+pip install -e .
 
-# Ubuntu/Debian
+# Ubuntu/Debian Cracking Backends
 sudo apt-get install hashcat john john-data
 ```
 
 ## Usage
 
-### 1. Identify Hash
+### 1. Identify Hashes
 
 ```bash
-# Single hash
-python -m smartcrack identify '$2b$12$Yzk7dXbKj.0.EKjEpqgvN.8EhY2x3QUBgLhK5E1V0sJl1p7qFRx3u'
+# Single hash (wrap in quotes if it contains '$')
+smartcrack identify '$2b$12$Yzk7dXbKj.0.EKjEpqgvN.8EhY2x3QUBgLhK5E1V0sJl1p7qFRx3u'
+
+# Credential dump line (/etc/shadow, pwdump, or user:hash)
+smartcrack identify 'root:$6$rounds=5000$salt$hash:18000:0:99999:7:::'
+smartcrack identify 'admin:5f4dcc3b5aa765d61d8327deb882cf99'
 
 # Multiple hashes from file
-python -m smartcrack identify hashes.txt
+smartcrack identify hashes.txt
 
 # JSON output for scripting
-python -m smartcrack identify hash.txt --json
+smartcrack identify hashes.txt --json
 
-# Custom wordlist for command examples
-python -m smartcrack identify hash.txt --wordlist rockyou.txt
+# Interactive mode (prompts for hash)
+smartcrack identify
 ```
 
-Output shows a table with all candidates, confidence, hashcat/john modes, and ready-to-copy commands.
-
-### 2. Configure Wordlist
+### 2. Crack Hashes
 
 ```bash
-# Set default
-python -m smartcrack config --wordlist /path/to/rockyou.txt
+# Automatic (infers format, detects installed tool, uses default or detected wordlist)
+smartcrack crack example_hashes.txt
 
-# View current config
-python -m smartcrack config --show
+# Explicit tool choice
+smartcrack crack -t hashcat -w wordlist_sample.txt example_hashes.txt
+smartcrack crack -t john -w wordlist_sample.txt example_hashes.txt
 
-# Reset to defaults
-python -m smartcrack config --reset
+# Brute-force mask attack (Hashcat)
+smartcrack crack -m 0 --mask '?d?d?d?d' hash.txt
 ```
-
-### 3. Crack (Manual Workflow)
-
-```bash
-# Auto-detect mode from identification, use hashcat
-python -m smartcrack crack --toolname hashcat --wordlist rockyou.txt hash.txt
-
-# Auto-detect format from identification, use john
-python -m smartcrack crack --toolname john --wordlist rockyou.txt hash.txt
 
 # Override hashcat mode if needed
 python -m smartcrack crack --toolname hashcat --hashcat-mode 0 --wordlist rockyou.txt hash.txt
