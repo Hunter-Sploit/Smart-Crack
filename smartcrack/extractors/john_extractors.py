@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from pathlib import Path
 
@@ -39,8 +39,13 @@ def extract_hash(path: Path, kind: str) -> list[ExtractedHash]:
     lines = [x.strip() for x in result.stdout.splitlines() if x.strip()]
     out: list[ExtractedHash] = []
     for line in lines:
-
-        payload = line.rsplit(":", 1)[-1].strip()
+        if line.startswith("$"):
+            payload = line
+        elif ":" in line:
+            parts = line.split(":", 1)
+            payload = parts[1] if len(parts) > 1 else line
+        else:
+            payload = line
 
         out.append(ExtractedHash(source=kind, raw_hash=payload))
     return out

@@ -23,9 +23,15 @@ dev = [
     "mypy>=1.0",
 ]
 
+[project.scripts]
+smartcrack = "smartcrack.cli:app"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["smartcrack*"]
+
+[tool.setuptools.package-data]
+smartcrack = ["identifiers/*.json", "*.json"]
 
 [tool.ruff]
 line-length = 100
